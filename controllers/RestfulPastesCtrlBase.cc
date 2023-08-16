@@ -10,7 +10,6 @@
 #include <drogon/HttpTypes.h>
 #include <drogon/orm/Exception.h>
 #include <exception>
-#include <iostream>
 #include <string>
 #include <trantor/utils/Logger.h>
 
@@ -19,7 +18,7 @@ void RestfulPastesCtrlBase::getOne(
     std::function<void(const HttpResponsePtr &)> &&callback,
     const std::string &code) {
 
-  auto dbClientPtr = drogon::app().getDbClient();
+  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
   auto callbackPtr =
       std::make_shared<std::function<void(const HttpResponsePtr &)>>(
           std::move(callback));
@@ -54,7 +53,7 @@ void RestfulPastesCtrlBase::updateOne(
     const std::string &token) {
   std::string content(request->getBody());
 
-  auto dbClientPtr = drogon::app().getDbClient();
+  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
   auto callbackPtr =
       std::make_shared<std::function<void(const HttpResponsePtr &)>>(
           std::move(callback));
@@ -86,7 +85,7 @@ void RestfulPastesCtrlBase::deleteOne(
     std::function<void(const HttpResponsePtr &)> &&callback,
     const std::string &token) {
 
-  auto dbClientPtr = drogon::app().getDbClient();
+  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
   auto callbackPtr =
       std::make_shared<std::function<void(const HttpResponsePtr &)>>(
           std::move(callback));
@@ -116,7 +115,7 @@ void RestfulPastesCtrlBase::deleteOne(
 void RestfulPastesCtrlBase::create(
     const HttpRequestPtr &request,
     std::function<void(const HttpResponsePtr &)> &&callback) {
-  auto dbClientPtr = drogon::app().getDbClient();
+  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
   auto callbackPtr =
       std::make_shared<std::function<void(const HttpResponsePtr &)>>(
           std::move(callback));
