@@ -21,19 +21,24 @@ class RestfulPastesCtrl : public drogon::HttpController<RestfulPastesCtrl>,
                           public RestfulPastesCtrlBase {
 public:
   METHOD_LIST_BEGIN
-  ADD_METHOD_TO(RestfulPastesCtrl::getOne, "/pastes", Get, Options);
-  ADD_METHOD_TO(RestfulPastesCtrl::updateOne, "/pastes", Put, Options);
-  ADD_METHOD_TO(RestfulPastesCtrl::deleteOne, "/pastes", Delete, Options);
+  ADD_METHOD_TO(RestfulPastesCtrl::getOne, "/pastes?code={1}", Get, Options);
+  ADD_METHOD_TO(RestfulPastesCtrl::updateOne, "/pastes?token={1}", Put,
+                Options);
+  ADD_METHOD_TO(RestfulPastesCtrl::deleteOne, "/pastes?token{1}", Delete,
+                Options);
   ADD_METHOD_TO(RestfulPastesCtrl::create, "/pastes", Post, Options);
   // ADD_METHOD_TO(RestfulPastesCtrl::update,"/pastes",Put,Options);
   METHOD_LIST_END
 
   void getOne(const HttpRequestPtr &request,
-              std::function<void(const HttpResponsePtr &)> &&callback);
+              std::function<void(const HttpResponsePtr &)> &&callback,
+              const std::string &code);
   void updateOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback);
+                 std::function<void(const HttpResponsePtr &)> &&callback,
+                 const std::string &token);
   void deleteOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback);
+                 std::function<void(const HttpResponsePtr &)> &&callback,
+                 const std::string &token);
   void create(const HttpRequestPtr &request,
               std::function<void(const HttpResponsePtr &)> &&callback);
 };

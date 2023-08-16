@@ -10,23 +10,23 @@
 
 void RestfulPastesCtrl::getOne(
     const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback) {
-  RestfulPastesCtrlBase::getOne(request, std::move(callback),
-                                request->getParameter("code"));
+    std::function<void(const HttpResponsePtr &)> &&callback,
+    const std::string &code) {
+  RestfulPastesCtrlBase::getOne(request, std::move(callback), code);
 }
 
 void RestfulPastesCtrl::updateOne(
     const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback) {
-  RestfulPastesCtrlBase::updateOne(request, std::move(callback),
-                                   request->getParameter("tojen"));
+    std::function<void(const HttpResponsePtr &)> &&callback,
+    const std::string &token) {
+  RestfulPastesCtrlBase::updateOne(request, std::move(callback), token);
 }
 
 void RestfulPastesCtrl::deleteOne(
     const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback) {
-  RestfulPastesCtrlBase::deleteOne(request, std::move(callback),
-                                   request->getParameter("token"));
+    std::function<void(const HttpResponsePtr &)> &&callback,
+    const std::string &token) {
+  RestfulPastesCtrlBase::deleteOne(request, std::move(callback), token);
 }
 
 void RestfulPastesCtrl::create(
