@@ -1,0 +1,31 @@
+version: "2.3"
+
+services:
+  postgres:
+    container_name: pastebin-database
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=pastebin
+      - POSTGRES_USER=pastebin
+      - POSTGRES_PASSWORD=pastebin
+    ports:
+      - 5432
+    volumes:
+      - ./postgresql/schemas:/docker-entrypoint-initdb.d
+      - ./.pgdata:/var/lib/postgresql/data
+    networks:
+      - postgres
+
+  server:
+    container_name: pastebin-server
+    build: .
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    networks:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
