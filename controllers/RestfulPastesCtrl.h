@@ -10,9 +10,7 @@
 #include "RestfulPastesCtrlBase.h"
 #include <drogon/HttpController.h>
 
-#include "Pastes.h"
 using namespace drogon;
-using namespace drogon_model::pastebin;
 /**
  * @brief this class is created by the drogon_ctl command.
  * this class is a restful API controller for reading and writing the pastes
