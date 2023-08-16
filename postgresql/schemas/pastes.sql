@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS pastes (
     id SERIAL PRIMARY KEY,
     code VARCHAR,
     content VARCHAR,
-    token UUID DEFAULT(gen_random_uuid())
+    token VARCHAR DEFAULT(gen_random_uuid())
 );
 
 create or replace function insert_pastes_code() returns trigger as $$
