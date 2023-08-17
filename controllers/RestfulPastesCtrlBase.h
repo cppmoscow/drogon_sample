@@ -9,6 +9,7 @@
 
 #include <drogon/HttpController.h>
 #include <drogon/orm/RestfulController.h>
+#include <drogon/utils/FunctionTraits.h>
 
 using namespace drogon;
 using namespace drogon::orm;
@@ -20,20 +21,12 @@ using namespace drogon::orm;
 
 class RestfulPastesCtrlBase : public RestfulController {
 public:
-  void getOne(const HttpRequestPtr &request,
-              std::function<void(const HttpResponsePtr &)> &&callback,
-              const std::string &code);
-  void updateOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback,
-                 const std::string &token);
-  void deleteOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback,
-                 const std::string &token);
-  void create(const HttpRequestPtr &request,
-              std::function<void(const HttpResponsePtr &)> &&callback);
-
-  //  void update(const HttpRequestPtr &request,
-  //              std::function<void(const HttpResponsePtr &)> &&callback);
+  Task<HttpResponsePtr> getOne(HttpRequestPtr request, const std::string &code);
+  Task<HttpResponsePtr> updateOne(HttpRequestPtr request,
+                                  const std::string &token);
+  Task<HttpResponsePtr> deleteOne(HttpRequestPtr request,
+                                  const std::string &token);
+  Task<HttpResponsePtr> create(HttpRequestPtr request);
 
   orm::DbClientPtr getDbClient() {
     return drogon::app().getDbClient(dbClientName_);

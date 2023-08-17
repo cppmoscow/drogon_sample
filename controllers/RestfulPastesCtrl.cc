@@ -6,31 +6,25 @@
  */
 
 #include "RestfulPastesCtrl.h"
+#include <drogon/utils/FunctionTraits.h>
+#include <drogon/utils/coroutine.h>
 #include <string>
 
-void RestfulPastesCtrl::getOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &code) {
-  RestfulPastesCtrlBase::getOne(request, std::move(callback), code);
+Task<HttpResponsePtr> RestfulPastesCtrl::getOne(HttpRequestPtr request,
+                                                const std::string &code) {
+  co_return co_await RestfulPastesCtrlBase::getOne(request, code);
 }
 
-void RestfulPastesCtrl::updateOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &token) {
-  RestfulPastesCtrlBase::updateOne(request, std::move(callback), token);
+Task<HttpResponsePtr> RestfulPastesCtrl::updateOne(HttpRequestPtr request,
+                                                   const std::string &token) {
+  co_return co_await RestfulPastesCtrlBase::updateOne(request, token);
 }
 
-void RestfulPastesCtrl::deleteOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &token) {
-  RestfulPastesCtrlBase::deleteOne(request, std::move(callback), token);
+Task<HttpResponsePtr> RestfulPastesCtrl::deleteOne(HttpRequestPtr request,
+                                                   const std::string &token) {
+  co_return co_await RestfulPastesCtrlBase::deleteOne(request, token);
 }
 
-void RestfulPastesCtrl::create(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback) {
-  RestfulPastesCtrlBase::create(request, std::move(callback));
+Task<HttpResponsePtr> RestfulPastesCtrl::create(HttpRequestPtr request) {
+  co_return co_await RestfulPastesCtrlBase::create(request);
 }

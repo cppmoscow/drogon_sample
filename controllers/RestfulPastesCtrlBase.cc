@@ -9,136 +9,111 @@
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpTypes.h>
 #include <drogon/orm/Exception.h>
+#include <drogon/utils/FunctionTraits.h>
 #include <exception>
 #include <string>
 #include <trantor/utils/Logger.h>
 
-void RestfulPastesCtrlBase::getOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &code) {
+Task<HttpResponsePtr> RestfulPastesCtrlBase::getOne(HttpRequestPtr request,
+                                                    const std::string &code) {
 
   auto dbClientPtr = drogon::app().getDbClient("pastes-database");
-  auto callbackPtr =
-      std::make_shared<std::function<void(const HttpResponsePtr &)>>(
-          std::move(callback));
 
-  dbClientPtr->execSqlAsync(
-      "SELECT content FROM pastes WHERE code = $1",
-      [request, callbackPtr](const drogon::orm::Result &result) {
-        if (result.size()) {
-          auto response = HttpResponse::newHttpResponse();
-          response->setBody(result.front()["content"].as<std::string>());
-          (*callbackPtr)(response);
-        } else {
-          auto response = HttpResponse::newHttpResponse();
-          response->setStatusCode(drogon::k404NotFound);
-          (*callbackPtr)(response);
-        }
-      },
-      [callbackPtr](const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        Json::Value ret;
-        ret["error"] = "database error";
-        auto resp = HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(k500InternalServerError);
-        (*callbackPtr)(resp);
-      },
-      code);
+  try {
+    auto result = co_await dbClientPtr->execSqlCoro(
+        "SELECT content FROM pastes WHERE code = $1", code);
+
+    if (result.size()) {
+      auto response = HttpResponse::newHttpResponse();
+      response->setBody(result.front()["content"].as<std::string>());
+      co_return response;
+    } else {
+      auto response = HttpResponse::newHttpResponse();
+      response->setStatusCode(drogon::k404NotFound);
+      co_return response;
+    }
+  } catch (const DrogonDbException &err) {
+    LOG_ERROR << err.base().what();
+    Json::Value result;
+    result["error"] = "database error";
+    auto response = HttpResponse::newHttpJsonResponse(result);
+    response->setStatusCode(k500InternalServerError);
+    co_return response;
+  }
 }
 
-void RestfulPastesCtrlBase::updateOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &token) {
+Task<HttpResponsePtr>
+RestfulPastesCtrlBase::updateOne(HttpRequestPtr request,
+                                 const std::string &token) {
+  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
   std::string content(request->getBody());
 
-  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
-  auto callbackPtr =
-      std::make_shared<std::function<void(const HttpResponsePtr &)>>(
-          std::move(callback));
-
-  dbClientPtr->execSqlAsync(
-      "UPDATE pastes SET content=$1 WHERE token::text=$2",
-      [request, callbackPtr](const drogon::orm::Result &result) {
-        if (result.affectedRows()) {
-          (*callbackPtr)(HttpResponse::newHttpResponse());
-        } else {
-          auto response = HttpResponse::newHttpResponse();
-          response->setStatusCode(drogon::k401Unauthorized);
-          (*callbackPtr)(response);
-        }
-      },
-      [callbackPtr](const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        Json::Value ret;
-        ret["error"] = "database error";
-        auto resp = HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(k500InternalServerError);
-        (*callbackPtr)(resp);
-      },
-      content, token);
+  try {
+    auto result = co_await dbClientPtr->execSqlCoro(
+        "UPDATE pastes SET content=$1 WHERE token::text=$2", content, token);
+    if (result.affectedRows()) {
+      co_return HttpResponse::newHttpResponse();
+    } else {
+      auto response = HttpResponse::newHttpResponse();
+      response->setStatusCode(drogon::k401Unauthorized);
+      co_return response;
+    }
+  } catch (const DrogonDbException &err) {
+    LOG_ERROR << err.base().what();
+    Json::Value result;
+    result["error"] = "database error";
+    auto response = HttpResponse::newHttpJsonResponse(result);
+    response->setStatusCode(k500InternalServerError);
+    co_return response;
+  }
 }
 
-void RestfulPastesCtrlBase::deleteOne(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    const std::string &token) {
+Task<HttpResponsePtr>
+RestfulPastesCtrlBase::deleteOne(HttpRequestPtr request,
+                                 const std::string &token) {
 
   auto dbClientPtr = drogon::app().getDbClient("pastes-database");
-  auto callbackPtr =
-      std::make_shared<std::function<void(const HttpResponsePtr &)>>(
-          std::move(callback));
 
-  dbClientPtr->execSqlAsync(
-      "DELETE FROM pastes WHERE token::text = $1",
-      [request, callbackPtr](const drogon::orm::Result &result) {
-        if (result.affectedRows()) {
-          (*callbackPtr)(HttpResponse::newHttpResponse());
-        } else {
-          auto response = HttpResponse::newHttpResponse();
-          response->setStatusCode(drogon::k401Unauthorized);
-          (*callbackPtr)(response);
-        }
-      },
-      [callbackPtr](const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        Json::Value ret;
-        ret["error"] = "database error";
-        auto resp = HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(k500InternalServerError);
-        (*callbackPtr)(resp);
-      },
-      token);
+  try {
+    auto result = co_await dbClientPtr->execSqlCoro(
+        "DELETE FROM pastes WHERE token::text = $1", token);
+    if (result.affectedRows()) {
+      co_return HttpResponse::newHttpResponse();
+    } else {
+      auto response = HttpResponse::newHttpResponse();
+      response->setStatusCode(drogon::k401Unauthorized);
+      co_return response;
+    }
+  } catch (const DrogonDbException &err) {
+    LOG_ERROR << err.base().what();
+    Json::Value result;
+    result["error"] = "database error";
+    auto response = HttpResponse::newHttpJsonResponse(result);
+    response->setStatusCode(k500InternalServerError);
+    co_return response;
+  }
 }
 
-void RestfulPastesCtrlBase::create(
-    const HttpRequestPtr &request,
-    std::function<void(const HttpResponsePtr &)> &&callback) {
+Task<HttpResponsePtr> RestfulPastesCtrlBase::create(HttpRequestPtr request) {
   auto dbClientPtr = drogon::app().getDbClient("pastes-database");
-  auto callbackPtr =
-      std::make_shared<std::function<void(const HttpResponsePtr &)>>(
-          std::move(callback));
-  bool needInsertion = true;
-  std::string content(request->getBody());
-  dbClientPtr->execSqlAsync(
-      "INSERT INTO pastes(content) VALUES($1) RETURNING code, token",
-      [request, callbackPtr](const drogon::orm::Result &result) {
-        const auto &row = result.front();
-        Json::Value ret;
-        ret["code"] = row["code"].as<std::string>();
-        ret["token"] = row["token"].as<std::string>();
-        (*callbackPtr)(HttpResponse::newHttpJsonResponse(ret));
-      },
-      [callbackPtr](const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        Json::Value ret;
-        ret["error"] = "database error";
-        auto resp = HttpResponse::newHttpJsonResponse(ret);
-        resp->setStatusCode(k500InternalServerError);
-        (*callbackPtr)(resp);
-      },
-      content);
+
+  try {
+    auto result = co_await dbClientPtr->execSqlCoro(
+        "INSERT INTO pastes(content) VALUES($1) RETURNING code, token",
+        request->getBody());
+    const auto &row = result.front();
+    Json::Value response;
+    response["code"] = row["code"].as<std::string>();
+    response["token"] = row["token"].as<std::string>();
+    co_return HttpResponse::newHttpJsonResponse(response);
+  } catch (const DrogonDbException &err) {
+    LOG_ERROR << err.base().what();
+    Json::Value result;
+    result["error"] = "database error";
+    auto response = HttpResponse::newHttpJsonResponse(result);
+    response->setStatusCode(k500InternalServerError);
+    co_return response;
+  }
 }
 
 RestfulPastesCtrlBase::RestfulPastesCtrlBase()

@@ -9,6 +9,7 @@
 
 #include "RestfulPastesCtrlBase.h"
 #include <drogon/HttpController.h>
+#include <drogon/utils/FunctionTraits.h>
 
 using namespace drogon;
 /**
@@ -30,15 +31,10 @@ public:
   // ADD_METHOD_TO(RestfulPastesCtrl::update,"/pastes",Put,Options);
   METHOD_LIST_END
 
-  void getOne(const HttpRequestPtr &request,
-              std::function<void(const HttpResponsePtr &)> &&callback,
-              const std::string &code);
-  void updateOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback,
-                 const std::string &token);
-  void deleteOne(const HttpRequestPtr &request,
-                 std::function<void(const HttpResponsePtr &)> &&callback,
-                 const std::string &token);
-  void create(const HttpRequestPtr &request,
-              std::function<void(const HttpResponsePtr &)> &&callback);
+  Task<HttpResponsePtr> getOne(HttpRequestPtr request, const std::string &code);
+  Task<HttpResponsePtr> updateOne(HttpRequestPtr request,
+                                  const std::string &token);
+  Task<HttpResponsePtr> deleteOne(HttpRequestPtr request,
+                                  const std::string &token);
+  Task<HttpResponsePtr> create(HttpRequestPtr request);
 };
