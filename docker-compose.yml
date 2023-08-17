@@ -2,7 +2,7 @@ version: "2.3"
 
 services:
   postgres:
-    container_name: pastebin-database
+    container_name: pastebin-drogon-database
     image: postgres:15
     environment:
       - POSTGRES_DB=pastebin
@@ -17,7 +17,7 @@ services:
       - postgres
 
   server:
-    container_name: pastebin-server
+    container_name: pastebin-drogon-server
     build: .
     ports:
       - 8080:8080
