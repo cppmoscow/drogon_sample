@@ -8,7 +8,7 @@
             "dbname": "pastebin",
             "user": "pastebin",
             "passwd": "pastebin",
-            "connection_number": 1
+            "connection_number": 4
         }
     ],
     "app": {
