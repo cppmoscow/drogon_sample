@@ -8,16 +8,12 @@
 #include "RestfulPastesCtrlBase.h"
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpTypes.h>
-#include <drogon/orm/Exception.h>
-#include <drogon/utils/FunctionTraits.h>
-#include <exception>
-#include <string>
 #include <trantor/utils/Logger.h>
 
 Task<HttpResponsePtr> RestfulPastesCtrlBase::getOne(HttpRequestPtr request,
                                                     const std::string &code) {
 
-  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
+  auto dbClientPtr = getDbClient();
 
   try {
     auto result = co_await dbClientPtr->execSqlCoro(
@@ -45,7 +41,7 @@ Task<HttpResponsePtr> RestfulPastesCtrlBase::getOne(HttpRequestPtr request,
 Task<HttpResponsePtr>
 RestfulPastesCtrlBase::updateOne(HttpRequestPtr request,
                                  const std::string &token) {
-  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
+  auto dbClientPtr = getDbClient();
   std::string content(request->getBody());
 
   try {
@@ -72,7 +68,7 @@ Task<HttpResponsePtr>
 RestfulPastesCtrlBase::deleteOne(HttpRequestPtr request,
                                  const std::string &token) {
 
-  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
+  auto dbClientPtr = getDbClient();
 
   try {
     auto result = co_await dbClientPtr->execSqlCoro(
@@ -95,7 +91,7 @@ RestfulPastesCtrlBase::deleteOne(HttpRequestPtr request,
 }
 
 Task<HttpResponsePtr> RestfulPastesCtrlBase::create(HttpRequestPtr request) {
-  auto dbClientPtr = drogon::app().getDbClient("pastes-database");
+  auto dbClientPtr = getDbClient();
 
   try {
     auto result = co_await dbClientPtr->execSqlCoro(
@@ -114,19 +110,4 @@ Task<HttpResponsePtr> RestfulPastesCtrlBase::create(HttpRequestPtr request) {
     response->setStatusCode(k500InternalServerError);
     co_return response;
   }
-}
-
-RestfulPastesCtrlBase::RestfulPastesCtrlBase()
-    : RestfulController({"id", "code", "content", "token"}) {
-  /**
-   * The items in the vector are aliases of column names in the table.
-   * if one item is set to an empty string, the related column is not sent
-   * to clients.
-   */
-  enableMasquerading({
-      "id",      // the alias for the id column.
-      "code",    // the alias for the code column.
-      "content", // the alias for the content column.
-      "token"    // the alias for the token column.
-  });
 }

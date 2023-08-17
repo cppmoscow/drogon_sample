@@ -8,18 +8,11 @@
 #pragma once
 
 #include <drogon/HttpController.h>
-#include <drogon/orm/RestfulController.h>
-#include <drogon/utils/FunctionTraits.h>
 
 using namespace drogon;
 using namespace drogon::orm;
-/**
- * @brief this class is created by the drogon_ctl command.
- * this class is a restful API controller for reading and writing the pastes
- * table.
- */
 
-class RestfulPastesCtrlBase : public RestfulController {
+class RestfulPastesCtrlBase {
 public:
   Task<HttpResponsePtr> getOne(HttpRequestPtr request, const std::string &code);
   Task<HttpResponsePtr> updateOne(HttpRequestPtr request,
@@ -32,8 +25,6 @@ public:
     return drogon::app().getDbClient(dbClientName_);
   }
 
-protected:
-  /// Ensure that subclasses inherited from this class are instantiated.
-  RestfulPastesCtrlBase();
-  const std::string dbClientName_{"default"};
+private:
+  const std::string dbClientName_{"pastes-database"};
 };
